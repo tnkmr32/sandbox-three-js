@@ -5,3 +5,6 @@ three.js の検証環境。
 1. index.html と main.js を記述して Web ブラウザで JS を動かしてみる
 
 https://threejs.org/docs/#manual/en/introduction/Installation
+
+
+https://threejs.org/examples/?q=fbx#webgl_loader_fbx
