@@ -2,6 +2,9 @@ import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 // import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { FBXLoader } from "three/examples/jsm/loaders/FBXLoader";
+import { ColladaLoader } from "three/examples/jsm/loaders/ColladaLoader";
+import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader";
+
 
 // const controls = new OrbitControls(camera, renderer.domElement);
 
@@ -13,12 +16,12 @@ const scene = new THREE.Scene();
 // 座標軸の表示
 scene.add(new THREE.AxesHelper(5));
 
-const light = new THREE.PointLight();
-light.position.set(0.8, 1.4, 1.0);
-scene.add(light);
+// const light = new THREE.PointLight();
+// light.position.set(0.8, 1.4, 1.0);
+// scene.add(light);
 
-const ambientLight = new THREE.AmbientLight();
-scene.add(ambientLight);
+// const ambientLight = new THREE.AmbientLight();
+// scene.add(ambientLight);
 
 // カメラの作成
 const camera = new THREE.PerspectiveCamera(
@@ -44,11 +47,19 @@ const controls = new OrbitControls(camera, document.body);
 controls.enableDamping = true;
 controls.dampingFactor = 0.2;
 
-//光源
-const dirLight = new THREE.SpotLight(0xffffff,10);//color,強度
-dirLight.position.set(-2000, 3000, 300);
-dirLight.castShadow = true;
-scene.add(dirLight);
+// //光源
+// const dirLight = new THREE.SpotLight(0xffffff, 1); //color,強度
+// dirLight.position.set(-2000, 3000, 300);
+// // dirLight.castShadow = true;
+// scene.add(dirLight);
+
+// 平行光源を作成
+const directionalLight = new THREE.DirectionalLight(0xffffff);
+directionalLight.position.set(1, 1, 1);
+scene.add(directionalLight);
+// 環境光を追加
+const ambientLight = new THREE.AmbientLight(0x333333);
+scene.add(ambientLight);
 
 const renderer = new THREE.WebGLRenderer();
 renderer.setClearColor(new THREE.Color(0xffffff));
@@ -70,42 +81,63 @@ document.body.appendChild(renderer.domElement);
 // const geometry = new THREE.BufferGeometry().setFromPoints(points);
 // const line = new THREE.Line(geometry, material);
 
-const loader = new FBXLoader();
-loader.load(
-  // "Taunt.fbx",
-  "untitled5.fbx",
-  (object) => {
-    object.scale.set(0.1, 0.1, 0.1);
-    //シーン内の特定のオブジェクトのアニメーション用のプレーヤー(アニメーションの調整)
-    mixer = new THREE.AnimationMixer(object);
-    //Animation Actionを生成
-    const action = mixer.clipAction(object.animations[0]);
-
-    //アニメーションを再生する
-    action.play();
-
-    //オブジェクトとすべての子孫に対してコールバックを実行
-    object.traverse((child) => {
-      if (child.isMesh) {
-        child.castShadow = true;
-        child.receiveShadow = true;
-        
-      }
-    });
-
-    scene.add(object);
-  },
-  (xhr) => {
-    console.log((xhr.loaded / xhr.total) * 100 + "% loaded");
-  },
-  (error) => {
-    console.log(error);
-  }
-);
+// // FBX
+// const loader = new FBXLoader();
+// loader.load(
+//   // "Taunt.fbx",
+//   "untitled5.fbx",
+//   (object) => {
+//     object.scale.set(0.1, 0.1, 0.1);
+//     //シーン内の特定のオブジェクトのアニメーション用のプレーヤー(アニメーションの調整)
+//     mixer = new THREE.AnimationMixer(object);
+//     //Animation Actionを生成
+//     const action = mixer.clipAction(object.animations[0]);
+//     //アニメーションを再生する
+//     action.play();
+//     //オブジェクトとすべての子孫に対してコールバックを実行
+//     object.traverse((child) => {
+//       if (child.isMesh) {
+//         child.castShadow = true;
+//         child.receiveShadow = true;
+//       }
+//     });
+//     scene.add(object);
+//   },
+//   (xhr) => {
+//     console.log((xhr.loaded / xhr.total) * 100 + "% loaded");
+//   },
+//   (error) => {
+//     console.log(error);
+//   }
+// );
 
 // scene.add(line);
 
 // camera.position.z = 5;
+
+// dae
+console.log("obj loading");
+const loader = new ColladaLoader(); //
+// const object = await loader.loadAsync("./Dragon/Dragon2.5_dae.dae"); // ここは通った "./models/collada/elf/elf.dae"
+const object = await loader.loadAsync("./models/collada/elf/elf.dae"); // ここは通った "./models/collada/elf/elf.dae"
+
+// const object = await loader.loadAsync('green-box-4.dae'); // ここは通った
+console.log("obj loaded");
+console.log(object);
+
+scene.add(object.scene);
+
+// // obj
+// // テクスチャの読み込み
+// const textureLoader = new THREE.TextureLoader();
+// const texture = textureLoader.load('textures/uv_grid_opengl.jpg');
+
+// console.log("obj loading");
+// const loader = new OBJLoader(); //
+// const object = await loader.loadAsync("./untitled.obj"); // ここは通った
+// // const object = await loader.loadAsync('green-box-4.dae'); // ここは通った
+// console.log("obj loaded");
+// scene.add(object);
 
 function animate() {
   if (mixer) {
